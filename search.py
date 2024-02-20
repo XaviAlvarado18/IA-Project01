@@ -81,14 +81,30 @@ class SearchProblem:
         util.raiseNotDefined()
 
     def getCostOfActionSequence(self, actions):
-        """
-         actions: A list of actions to take
+        if actions in [Direction.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+            return 1
+        elif action == Directions.STOP:
+            return 0
+        else:
+            return 2
 
-        This method returns the total cost of a particular sequence of actions.
-        The sequence must be composed of legal moves.
-        """
-        util.raiseNotDefined()
 
+from util import PriorityQueue
+class PriorityQueueClass(PriorityQueue):
+    """
+    Implements a priority queue with the same push/pop signature of the
+    Queue and the Stack classes. This is designed for drop-in replacement for
+    those two classes. The caller has to provide a priority function, which
+    extracts each item's priority.
+    """
+    def  __init__(self, problem, priorityFunction):
+        "priorityFunction (item) -> priority"
+        self.priorityFunction = priorityFunction      # store the priority function
+        PriorityQueue.__init__(self)        # super-class initializer
+        self.problem = problem
+    def push(self, item, heuristic):
+        "Adds an item to the queue with priority from the priority function"
+        PriorityQueue.push(self, item, self.priorityFunction(self.problem,item,heuristic))
 
 def tinyMazeSearch(problem):
     """
@@ -208,10 +224,54 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
+class Node:
+    def __init__(self, state, pred=None, act=None, cost=0, eq=0):
+        self.state = state
+        self.pred = pred
+        self.act = act
+        self.cost = cost
+        self.eq = eq
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    priority_queue = util.PriorityQueue()
+    visited = set()
+
+    start_state = problem.getStartState()
+    start_node = Node(state=start_state, cost=0, eq=heuristic(start_state, problem))
+    priority_queue.push(start_node, start_node.cost + start_node.eq)
+
+    while not priority_queue.isEmpty():
+        current_node = priority_queue.pop()
+        current_state = current_node.state
+        current_cost = current_node.cost
+
+        if current_state in visited:
+            continue
+
+        visited.add(current_state)
+
+        if problem.isGoalState(current_state):
+            break
+
+        for successor_state, action, step_cost in problem.get_successors(current_state):
+            if successor_state not in visited:
+                new_node = Node(
+                    state=successor_state,
+                    pred=current_node,
+                    act=action,
+                    cost=current_cost + step_cost,
+                    eq=heuristic(successor_state, problem)
+                )
+                priority_queue.push(new_node, new_node.cost + new_node.eq)
+
+    actions = []
+    while current_node.act is not None:
+        actions.insert(0, current_node.act)
+        current_node = current_node.pred
+
+    return actions
 
 
 # Abbreviations
