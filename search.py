@@ -81,7 +81,7 @@ class SearchProblem:
         util.raiseNotDefined()
 
     def getCostOfActionSequence(self, actions):
-        if actions in [Direction.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        if actions in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             return 1
         elif action == Directions.STOP:
             return 0
@@ -199,7 +199,7 @@ def breadthFirstSearch(problem):
             return current_path
 
         # Get successors of the current state #
-        successors = problem.get_successors(current_state)
+        successors = problem.expand(current_state)
 
         # Add new states to the queue and update their path #
         if successors:

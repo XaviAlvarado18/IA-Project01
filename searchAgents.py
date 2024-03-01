@@ -339,6 +339,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        return (self.startingPosition, [])
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -346,6 +347,14 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        node = state[0]
+        visited_states = state[1]
+
+        if node in self.corners:
+            if not node in visited_states:
+                visited_states.append(node)
+            return len(visited_states) == 4
+        return False
         util.raiseNotDefined()
 
     def expand(self, state):
@@ -358,12 +367,17 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that child
         """
-
         children = []
         for action in self.getActions(state):
             # Add a child state to the child list if the action is legal
             # You should call getActions, getActionCost, and getNextState.
             "*** YOUR CODE HERE ***"
+            for action in self.getActions(state):
+                next_state = self.getNextState(state, action)
+                cost = self.getActionCost(state, action, next_state)
+                children.append((next_state, action, cost))
+            self._expanded += 1
+            return children
 
         self._expanded += 1 # DO NOT CHANGE
         return children
@@ -391,6 +405,11 @@ class CornersProblem(search.SearchProblem):
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
         "*** YOUR CODE HERE ***"
+        next_state = ((nextx, nexty), list(state[1]))
+        if next_state[0] in self.corners:
+            if next_state[0] not in next_state[1]:
+                next_state[1].append(next_state[0])
+        return next_state
         util.raiseNotDefined()
 
     def getCostOfActionSequence(self, actions):
