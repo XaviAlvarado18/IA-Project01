@@ -236,7 +236,7 @@ class Node:
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     priority_queue = util.PriorityQueue()
-    visited = set()
+    visited = []
 
     start_state = problem.getStartState()
     start_node = Node(state=start_state, cost=0, eq=heuristic(start_state, problem))
@@ -250,12 +250,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         if current_state in visited:
             continue
 
-        visited.add(current_state)
+        visited.append(current_state)
 
         if problem.isGoalState(current_state):
             break
 
-        for successor_state, action, step_cost in problem.get_successors(current_state):
+        for successor_state, action, step_cost in problem.expand(current_state):
             if successor_state not in visited:
                 new_node = Node(
                     state=successor_state,
