@@ -554,7 +554,7 @@ def foodHeuristic(state, problem):
     consistent as well.
 
     If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
+    your heuristic is not consistent, and probably not admissible!  On the
     other hand, inadmissible or inconsistent heuristics may find optimal
     solutions, so be careful.
 
@@ -566,7 +566,7 @@ def foodHeuristic(state, problem):
     problem.  For example, problem.walls gives you a Grid of where the walls
     are.
 
-    If you want to *store* information to be reused in other calls to the
+    If you want to store information to be reused in other calls to the
     heuristic, there is a dictionary called problem.heuristicInfo that you can
     use. For example, if you only want to count the walls once and store that
     value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
@@ -574,8 +574,28 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    "* YOUR CODE HERE *"
+    if foodGrid.count() == 0:
+        return 0
+    
+    foodtoEat = set(foodGrid.asList())
+    totalCost = 0
+    while foodtoEat:
+        # Encontrar la comida más cercana al Pac-Man
+        min_distance = float('inf')
+        nearest_food = None
+        for food in foodtoEat:
+            distance = util.manhattanDistance(position, food)
+            if distance < min_distance:
+                min_distance = distance
+                nearest_food = food
+        # Actualizar la distancia total y posición del Pac-Man
+        totalCost += min_distance
+        position = nearest_food
+        # Eliminar la comida más cercana de la lista
+        foodtoEat.remove(nearest_food)
+
+    return totalCost
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
